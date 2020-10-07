@@ -1,5 +1,6 @@
-/**
+/*
  * @author Caroline Cavaliere
+ * This class models the attributes of a face and draws them on the screen.
  */
 package com.example.facemaker;
 import android.content.Context;
@@ -17,27 +18,24 @@ import android.widget.Spinner;
 
 import androidx.annotation.RequiresApi;
 
-public class Face extends SurfaceView implements Spinner.OnItemSelectedListener, SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener, View.OnClickListener{
+public class Face extends SurfaceView
+{
 
-    int skinColor;
-    int eyeColor;
-    int hairColor;
-    int hairStyle;
+    private int skinColor;
+    private int eyeColor;
+    private int hairColor;
+    private int hairStyle;
 
-    Paint skinPaint = new Paint();
-    Paint eyePaint = new Paint();
-    Paint hairPaint = new Paint();
-    Paint whitePaint = new Paint();
-    Paint blackPaint = new Paint();
-    Paint greenPaint = new Paint();
+    private Paint skinPaint = new Paint();
+    private Paint eyePaint = new Paint();
+    private Paint hairPaint = new Paint();
+    private Paint whitePaint = new Paint();
+    private Paint blackPaint = new Paint();
 
-    boolean hairChecked = true;
-    boolean skinChecked = false;
-    boolean eyesChecked = false;
-
-    SeekBar blue = findViewById(R.id.blue);
-    SeekBar red = findViewById(R.id.red);
-    SeekBar green = findViewById(R.id.green);
+    //indicates which RadioButton is selected
+    private boolean hairChecked = true;
+    private boolean skinChecked = false;
+    private boolean eyesChecked = false;
 
 
     public Face(Context context, AttributeSet a)
@@ -46,52 +44,45 @@ public class Face extends SurfaceView implements Spinner.OnItemSelectedListener,
         randomize();
         setWillNotDraw(false);
 
-
-
+        skinPaint.setColor(skinColor);
+        skinPaint.setStyle(Paint.Style.FILL);
+        whitePaint.setColor(Color.WHITE);
+        whitePaint.setStyle(Paint.Style.FILL);
+        blackPaint.setColor(Color.BLACK);
+        blackPaint.setStyle(Paint.Style.FILL);
+        eyePaint.setColor(eyeColor);
+        eyePaint.setStyle(Paint.Style.FILL);
+        hairPaint.setColor(hairColor);
+        hairPaint.setStyle(Paint.Style.FILL);
         setBackgroundColor(Color.WHITE);
 
     }
 
-    public void randomize()//produces random ints to represent skin/eye/hair color and hair style
+    /**
+     * Produces random ints to represent skin/eye/hair color and hair style
+     */
+    public void randomize()
     {
-        skinColor = Color.rgb((int)Math.random()*256,(int) Math.random()*256,(int)Math.random()*256);
-        eyeColor = Color.rgb((int)Math.random()*256,(int) Math.random()*256,(int)Math.random()*256);
-        hairColor = Color.rgb((int)Math.random()*256,(int) Math.random()*256,(int)Math.random()*256);
-        hairStyle = (int)Math.random()*3;//there are three hair styles to choose from
+        skinColor = android.graphics.Color.argb(255,(int)(Math.random()*256),(int) (Math.random()*256),(int)(Math.random()*256));
+        eyeColor = android.graphics.Color.argb(255,(int)(Math.random()*256),(int) (Math.random()*256),(int)(Math.random()*256));
+        hairColor = android.graphics.Color.argb(255,(int)(Math.random()*256),(int) (Math.random()*256),(int)(Math.random()*256));
+        hairStyle = (int)(Math.random()*3);//there are three hair styles to choose from
 
-
-        if(hairChecked==true)
-        {
-            blue.setProgress(Color.blue(skinColor));
-            red.setProgress(Color.red(skinColor));
-            green.setProgress(Color.green(skinColor));
-        }
-
-        if(eyesChecked==true)
-        {
-            blue.setProgress(Color.blue(eyeColor));
-            red.setProgress(Color.red(eyeColor));
-            green.setProgress(Color.green(eyeColor));
-        }
-
-        if(skinChecked==true)
-        {
-            blue.setProgress(Color.blue(hairColor));
-            red.setProgress(Color.red(hairColor));
-            green.setProgress(Color.green(hairColor));
-        }
 
         /**
          * External Citation
-         *      Date: 9 September 2020
+         *      Date: 9 October 2020
          *      Problem: Did not know how to represent a color using a single int.
          *      Resource:
-         *          https://developer.android.com/reference/android/graphics/Color
-         *      Solution: I used the rgb method in the Color class to produce a color int from three random red, green, and blue values.
+         *          https://developer.android.com/reference/android/graphics/Color#argb(int,%20int,%20int,%20int)
+         *      Solution: I used the argb method in the Color class to produce a color int from three random red, green, and blue values and an alpha value.
          */
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
+    /**
+     * Draws the face onscreen.
+     */
     public void onDraw(Canvas canvas)
     {
         skinPaint.setColor(skinColor);
@@ -102,141 +93,132 @@ public class Face extends SurfaceView implements Spinner.OnItemSelectedListener,
         blackPaint.setStyle(Paint.Style.FILL);
         eyePaint.setColor(eyeColor);
         eyePaint.setStyle(Paint.Style.FILL);
-        greenPaint.setColor(Color.GREEN);
-        greenPaint.setStyle(Paint.Style.FILL);
-        canvas.drawOval(150.0f, 150.0f, 1050.0f, 1150.0f, skinPaint);
+        hairPaint.setColor(hairColor);
+        hairPaint.setStyle(Paint.Style.FILL);
 
+        drawHair(canvas, 150.0f, 150.0f, 1050.0f, 1150.0f, hairPaint);
+        canvas.drawOval(150.0f, 150.0f, 1050.0f, 1150.0f, skinPaint); //draw head
         drawEye(canvas, 300.0f, 400.0f, 500.0f, 600.0f, eyePaint);
         drawEye(canvas, 700.0f, 400.0f,900.0f, 600.0f, eyePaint);
-        //drawEye(canvas, 900.0f, 300.0f, 1000.0f, 400.0f, eyePaint);
+        canvas.drawArc(300.0f, 300.0f, 900.0f, 1000.0f, 180, -180, false, blackPaint);//draw mouth
+
+
     }
 
+    /**
+     * Draws an eye. Positional parameters refer to where the white part of the eye is drawn.
+     * @param canvas
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @param paint
+     */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void drawEye(Canvas canvas, float left, float top, float right, float bottom, Paint paint)
     {
-        canvas.drawOval(left, top, right, bottom, whitePaint);
-        canvas.drawOval(left+30.0f, top+30.0f, right-30.0f, bottom-30.0f, greenPaint);
-        canvas.drawOval(left+50.0f, top+50.0f, right-50.0f, bottom-50.0f, blackPaint);
+        canvas.drawOval(left, top, right, bottom, whitePaint);//draw white part of eye
+        canvas.drawOval(left+30.0f, top+30.0f, right-30.0f, bottom-30.0f, eyePaint);
+        canvas.drawOval(left+50.0f, top+50.0f, right-50.0f, bottom-50.0f, blackPaint);//draw pupil
     }
 
-
-    public void drawHair(Canvas canvas, String style)
+    /**
+     * Draws the hair style indicated by the Spinner. Positional parameters refer to where
+     * the head is drawn.
+     * @param canvas
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @param paint
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void drawHair(Canvas canvas, float left, float top, float right, float bottom, Paint paint)
     {
+        if (hairStyle==1)//draw long hair
+        {
+            canvas.drawRect(left+50.0f, top+300.0f, right-50.0f, bottom+100.0f, paint);
+        }
+        else if(hairStyle==2)//draw space buns
+        {
+            canvas.drawOval(left-20.0f, top, right-710.0f, bottom-780.0f, paint);
+            canvas.drawOval(left+710.0f, top, right+20.0f, bottom-780.0f, paint);
+        }
 
     }
 
-    public void drawNose(Canvas canvas, float left, float right, float stopLeft, float stopRight)
+
+    //getters and setters
+    public int getEyeColor()
     {
-        canvas.drawLine(left, right, stopLeft, stopRight, blackPaint);
-
+        return eyeColor;
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+    public int getHairColor()
     {
-        hairStyle = i;
-        this.invalidate();
+        return hairColor;
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+    public int getHairStyle()
     {
-        if(seekBar==findViewById(R.id.red))
-        {
-            if(hairChecked)
-            {
-                hairColor = Color.rgb(i, Color.green(hairColor), Color.blue(hairColor));
-            }
-            else if(skinChecked)
-            {
-                skinColor = Color.rgb(i, Color.green(skinColor), Color.blue(skinColor));
-            }
-            else if(eyesChecked)
-            {
-                eyeColor = Color.rgb(i, Color.green(eyeColor), Color.blue(eyeColor));
-            }
-        }
-        else if(seekBar==findViewById(R.id.green))
-        {
-            if(hairChecked)
-            {
-                hairColor = Color.rgb(Color.red(hairColor), i, Color.blue(hairColor));
-            }
-            else if(skinChecked)
-            {
-                skinColor = Color.rgb(Color.red(skinColor), i, Color.blue(skinColor));
-            }
-            else if(eyesChecked)
-            {
-                eyeColor = Color.rgb(Color.red(skinColor), i, Color.blue(eyeColor));
-            }
-        }
-        else if(seekBar==findViewById(R.id.blue))
-        {
-            if(hairChecked)
-            {
-                hairColor = Color.rgb(Color.red(hairColor), Color.green(hairColor), i);
-            }
-            else if(skinChecked)
-            {
-                skinColor = Color.rgb(Color.red(skinColor), Color.green(skinColor), i);
-            }
-            else if(eyesChecked)
-            {
-                eyeColor = Color.rgb(Color.red(skinColor), Color.green(eyeColor), i);
-            }
-        }
-        this.invalidate();
+        return hairStyle;
     }
 
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
+    public int getSkinColor()
+    {
+        return skinColor;
     }
 
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
+    public boolean getSkinChecked()
+    {
+        return skinChecked;
     }
 
-    @Override
-    public void onCheckedChanged(RadioGroup radioGroup, int i) {
-
-
-
-        if(i==R.id.hair)
-        {
-            hairChecked = true;
-            eyesChecked = false;
-            skinChecked = false;
-
-        }
-        else if(i==R.id.eyes)
-        {
-            hairChecked = false;
-            eyesChecked = true;
-            skinChecked = false;
-
-        }
-        else if(i==R.id.skin)
-        {
-            hairChecked = false;
-            eyesChecked = false;
-            skinChecked = true;
-
-        }
-        this.invalidate();
+    public boolean getEyesChecked()
+    {
+        return eyesChecked;
     }
 
-    @Override
-    public void onClick(View view) {
-        randomize();
-        this.invalidate();
+    public boolean getHairChecked()
+    {
+        return hairChecked;
     }
+
+    public void setEyeColor(int eyeColor)
+    {
+        this.eyeColor = eyeColor;
+    }
+
+
+    public void setEyesChecked(boolean eyesChecked)
+    {
+        this.eyesChecked = eyesChecked;
+    }
+
+    public void setHairChecked(boolean hairChecked)
+    {
+        this.hairChecked = hairChecked;
+    }
+
+    public void setHairColor(int hairColor)
+    {
+        this.hairColor = hairColor;
+    }
+
+    public void setHairStyle(int hairStyle)
+    {
+        this.hairStyle = hairStyle;
+    }
+
+    public void setSkinChecked(boolean skinChecked)
+    {
+        this.skinChecked = skinChecked;
+    }
+
+    public void setSkinColor(int skinColor)
+    {
+        this.skinColor = skinColor;
+    }
+
 }
 
